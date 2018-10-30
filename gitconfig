@@ -1,0 +1,19 @@
+[alias]
+	co = checkout
+	ci = commit
+	a = add
+	pl = pull
+	ps = push
+	br = checkout -b
+	l1p = log -1 -p
+	st = status
+	cp = cherry-pick
+	d = diff
+	ds = diff --staged
+[user]
+	name = Chris Thompson
+	email = cthompson01@massmutual.com
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+[http]
+	sslcainfo = /Users/mm00772/.ssh/mm-cert-bundle.pem.unix

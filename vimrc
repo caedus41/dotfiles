@@ -14,6 +14,7 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
+Plugin 'godlygeek/tabular'
 
 
 call vundle#end()            " required
@@ -132,11 +133,16 @@ set viewoptions=cursor
 autocmd BufWinLeave * if expand("%") != "" | mkview   | endif
 autocmd BufWinEnter * if expand("%") != "" | loadview | endif
 
-
 "------ Single Character Insert -
 function! RepeatChar(char, count)
     return repeat(a:char, a:count)
 endfunction
+
+"------ Syntax and Spacing
+autocmd FileType html setlocal shiftwidth=2 tabstop=2
+autocmd FileType tf setlocal shiftwidth=2 tabstop=2
+autocmd FileType yml setlocal shiftwidth=2 tabstop=2
+autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
 nnoremap <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 nnoremap <Tab>   :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
@@ -200,5 +206,7 @@ let g:EasyMotion_leader_key = 'z'
 let g:multi_cursor_exit_from_visual_mode = 0
 let g:multi_cursor_exit_from_insert_mode = 0
 
+"------- NERDTREE THINGIES ------
+let NERDTreeShowHidden=1
 
 noremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
