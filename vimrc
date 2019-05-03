@@ -9,12 +9,24 @@ call vundle#begin()
 " Go on, tell me that vim isn't an IDE. I dare ya. I triple dog dare ya!
 " Configs exist in this file for ctrl-p and vim-multiple-cursors
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
+Plugin 'avakhov/vim-yaml'
 Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'godlygeek/tabular'
+Plugin 'hashivim/vim-terraform'
+Plugin 'jiangmiao/auto-pairs'
+Plugin 'majutsushi/tagbar'
+Plugin 'nvie/vim-flake8'
+Plugin 'rizzatti/dash.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
-Plugin 'godlygeek/tabular'
+
+
+
+
 
 
 call vundle#end()            " required
@@ -57,6 +69,7 @@ nnoremap $ ^
 nnoremap ^ $
 imap <C-c> <Esc>
 map <C-n> :NERDTreeToggle<CR>
+nmap <C-m> :TagbarToggle<CR>
 nnoremap <silent> <C-l> :nohl<CR><C-l>
 nnoremap s :exec "normal i".nr2char(getchar())."\e"<CR>
 " nnoremap Y y^
@@ -139,14 +152,17 @@ function! RepeatChar(char, count)
 endfunction
 
 "------ Syntax and Spacing
-autocmd FileType html setlocal shiftwidth=2 tabstop=2
-autocmd FileType tf setlocal shiftwidth=2 tabstop=2
-autocmd FileType yml setlocal shiftwidth=2 tabstop=2
-autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
-
 nnoremap <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 nnoremap <Tab>   :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 
+autocmd FileType html setlocal shiftwidth=2 tabstop=2
+autocmd FileType yml setlocal shiftwidth=2 tabstop=2
+autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
+
+"------ Terraform Syntax and Spacing
+let g:rerraform_align=1
+let g:terraform_fold_sections=1
+let g:terraform_remap_spacebar=1
 
 "------ Trailing Whitespace -----
 function! TrimWhitespace()
@@ -180,13 +196,13 @@ let g:ctrlp_mruf_relative = 1
 let g:ctrlp_mruf_case_sensitive = 0
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
 if executable('ag')
- "" Use Ag over Grep
- "set grepprg=ag\ --nogroup\ --nocolor
+ " Use Ag over Grep
+ set grepprg=ag\ --nogroup\ --nocolor
 
- "" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
- "let g:ctrlp_user_command = 'ag %s -l -U --nocolor -g ""'
- "" Don't cache since ag is fast enough
- "let g:ctrlp_use_caching = 0
+ " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+ let g:ctrlp_user_command = 'ag %s -l -U --nocolor -g ""'
+ " Don't cache since ag is fast enough
+ let g:ctrlp_use_caching = 0
 endif
 
 "------ Anything sublime can do, vim can do better (with help) ----
@@ -196,6 +212,7 @@ let g:multi_cursor_next_key='<C-m>'
 let g:multi_cursor_prev_key='<C-b>'
 let g:multi_cursor_skip_key='<C-x>'
 let g:multi_cursor_quit_key='<Esc>'
+
 
 
 "------- Easymotion --------------
@@ -208,5 +225,7 @@ let g:multi_cursor_exit_from_insert_mode = 0
 
 "------- NERDTREE THINGIES ------
 let NERDTreeShowHidden=1
+let NERDTreeMinimalUI = 1
+let NERDTreeDirArrows = 1
 
 noremap <silent> <Space> :nohlsearch<Bar>:echo<CR>

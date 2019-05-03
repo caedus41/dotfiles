@@ -12,8 +12,4 @@
 	ds = diff --staged
 [user]
 	name = Chris Thompson
-	email = cthompson01@massmutual.com
-[url "https://github.com/"]
-	insteadOf = git@github.com:
-[http]
-	sslcainfo = /Users/mm00772/.ssh/mm-cert-bundle.pem.unix
+	email = cthompson@oreilly.com

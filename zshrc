@@ -2,12 +2,16 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/mm00772/.oh-my-zsh
+export ZSH=/Users/cthompson/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="robbyrussell"
+#ZSH_THEME="powerlevel9k/powerlevel9k"
+export TERM="xterm-256color"
+#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status dir vcs)
+
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
@@ -102,39 +106,68 @@ unsetopt beep
 bindkey -e
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
-zstyle :compinstall filename '/Users/mm00772/.zshrc'
+zstyle :compinstall filename '/Users/cthompson/.zshrc'
 
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
+
+# ----------------------------------------
+# Bash-like (Thanks Mitch)
+# ----------------------------------------
+
+# Ctrl+U  -->  delete until beginning of line (not whole line)
+bindkey \^U backward-kill-line
+
+# Ctrl+K  -->  delete until end of line
+bindkey \^Y kill-line
+
+# zsh forward / backward words like bash (jump to end of word when moving forward)
+autoload -U select-word-style
+select-word-style bash
 
 # Env Vars
 export HISTTIMEFORMAT="%d/%m/%y %T "
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$PATH:/usr/local/bin/go"
+export GOPATH=$HOME/go
+export PATH="$PATH:$GOPATH/bin"
 
-## MM SPECIFIC
+# Virtualenvs
 
-source /usr/local/share/zsh/site-functions
+export WORKON_HOME=~/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
-export WORKON_HOME=$HOME/.virtualenvs
 
-export AWS_CA_BUNDLE=~/.ssh/mm-cert-bundle.pem.unix
-export REQUESTS_CA_BUNDLE=~/.ssh/mm-cert-bundle.pem.unix
+# Fubectl
 
-source /usr/local/bin/fubectl.source
+[ -f /usr/local/bin/fubectl.source ] && source /usr/local/bin/fubectl.source
+#source /path/to/kube-ps1.sh
+#PROMPT='$(kube_ps1)'$PROMPT
 
+# Helm
+source <(helm completion zsh)
+
+# Updates PATH for the Google Cloud SDK.
+if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin/google-cloud-sdk/path.zsh.inc'; fi
+
+# O'Reilly Init
+source /Users/cthompson/.oreilly_zsh.sh
+
+# ----------------------------------------
 # Aliases
+# ----------------------------------------
+
 alias awls='awless list instances'
 alias crontab='crontab -i'
 #alias did="vim +'normal Go' +'r!date' ~/did.txt"
+alias dc='docker-compose'
 alias didt='tail -n 10 ~/.did.txt'
-alias gt='cat ~/.ssh/git_token | pbcopy'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias ksh='kex /bin/bash'
+alias ks='ls' # We all make mistakes
 alias l='ls -CF'
 alias la='ls -A'
 alias ll='ls -alF'
@@ -144,22 +177,26 @@ alias tags='git for-each-ref --format="%(taggerdate): %(refname)" --sort=-tagger
 alias cl='clear'
 alias g='git'
 alias Grep='grep'
-alias grin='grep -rIin'
-alias infra='cd /Users/mm00772/workspace/aws-infra/'
-alias ipython='python -m IPython'
+#alias grin='grep -rIin'
+alias i='infractl'
+alias infra='cd /Users/cthompson/workspace/infractl/'
 alias k='kubectl'
+alias ksfo='kubectl110 --context=prod-sfo'
 alias pretty='python -m json.tool'
 alias show='knife node show'
 alias tf='terraform'
-alias tfm='cd ~/workspace/tf-modules'
 alias tfia='terraform init && terraform apply'
 alias tfds='cd ~/workspace/tf-ds'
 alias trf='terraform'
+alias tns='tmux new -s'
+alias tls='tmux ls'
+alias tas='tmux attach -t'
+alias tks='tmux kill-session -t'
 alias v='workon'
 alias vd='deactivate'
-alias vm='mkvirtualenv'
+alias vm='mkvirtualenv --python=/usr/local/bin/python3'
 alias vr='rmvirtualenv'
-alias ws='cd /Users/mm00772/workspace'
+alias ws='cd ~/workspace'
 
 ff() {
     find ./ -name "*$1*"
@@ -178,7 +215,14 @@ fv() {
   IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
   [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 }
-
+grin() {
+    if [[ -z $2 ]]; then
+        DIR="./"
+    else
+        DIR=$2
+    fi
+    grep -rIin $1 $DIR
+}
 ish() { # Let's you ssh to aws instance ids, should auto-discover keys with awless
     # Old version, still useful
     # ssh `aws ec2 describe-instances --instance-ids "$1" | jq -r '.Reservations[].Instances[].PrivateIpAddress'`
@@ -195,14 +239,14 @@ o22() {
 nsh() {
     ish `awls --tag Name=$1 --ids|head -n1`
 }
-# src() {
-#     cd ~/workspace/aws-infra && v infra && source env/$1.sh && cd -
-# }
-src() {
-    cd ~/workspace/sre-aws-helpers/ && source me && creds $1 && cd -
-}
 did() {
     echo "`date` $*" >> ~/.did.txt
 }
-
-export PATH="/usr/local/opt/postgresql@9.6/bin:$PATH"
+rsed() {
+    // TODO
+    // recursive sed
+    find . -type f -exec sed -i.bak "s/coot-test.git/coot.git/" {} \;
+}
+bd() {
+    echo $1 | base64 -D
+}
