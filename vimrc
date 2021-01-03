@@ -1,49 +1,56 @@
-set nocompatible                " shine like the star you are
+" shine like the star you are
+set nocompatible
 filetype off
 
-
+" ------------------------------------
+"  -------- VUNDLE SETUP  ---------
+" ------------------------------------
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " Go on, tell me that vim isn't an IDE. I dare ya. I triple dog dare ya!
-" Configs exist in this file for ctrl-p and vim-multiple-cursors
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
+" Configs exist in this file for ctrl-p
 Plugin 'airblade/vim-gitgutter'
 Plugin 'avakhov/vim-yaml'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'hashivim/vim-terraform'
-Plugin 'jiangmiao/auto-pairs'
 Plugin 'majutsushi/tagbar'
-Plugin 'nvie/vim-flake8'
-Plugin 'rizzatti/dash.vim'
+Plugin 'mbbill/undotree'
 Plugin 'scrooloose/nerdtree'
+Plugin 'tmhedberg/SimpylFold'
+Plugin 'Konfekt/FastFold'
 Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-
-
-
-
+Plugin 'vim-syntastic/syntastic'
+Plugin 'wfxr/forgit'
+Plugin 'ycm-core/YouCompleteMe'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 
 call vundle#end()            " required
 filetype plugin indent on    " required
+" -------- Vundle Setup End --------
 
-"Miscellany --------------
-syntax enable
-set nu "the only thing that really matters here, let's be honest
-colorscheme desert
-filetype plugin on
+
+" ------------------------------------
+"  -------- VIM Config  ---------
+" ------------------------------------
+
+"-------------- Miscellany --------------
+" Don't beep at me
 set visualbell
 set noerrorbells
+" Make it look pretty
+colorscheme desert
+syntax enable
+set nu
 
 
 "------ Knobs. Also Dials -------
 set ttimeoutlen=0               " time waits for no man's editor
-" set clipboard=unnamedplus       " + +
 set hidden                      " monsters in the dark
 set scrolloff=999               " what's the biggest number you can think of?
 set laststatus=2                " and never darken my doorstep again
@@ -58,21 +65,23 @@ set visualbell
 
 "------ General Remappings ------
 let mapleader=","
+" Don't be picky about quitting
 ca Q q
 ca W w
 ca X x
+" FfTt backwards
 noremap \ ,
 nnoremap ; :
-" At what point did someone decide 'the one on the left takes you to the
-" right'.... >_>
+" At what point did someone decide 'the one on the left takes you to the right'.... >_>
 nnoremap $ ^
 nnoremap ^ $
+" Ctrl-C your way to victory
 imap <C-c> <Esc>
-map <C-n> :NERDTreeToggle<CR>
-nmap <C-m> :TagbarToggle<CR>
-nnoremap <silent> <C-l> :nohl<CR><C-l>
-nnoremap s :exec "normal i".nr2char(getchar())."\e"<CR>
-" nnoremap Y y^
+" Y will conform
+nnoremap Y y^
+" And K will grep
+nnoremap <silent> K :Ggrep <cword><CR>
+
 
 "------ Splits -----------------
 nnoremap <C-J> <C-W><C-J>
@@ -95,15 +104,16 @@ set tabstop=4
 set autoindent
 set cindent
 
-"------ 80 Char line limit ------
-"let &colorcolumn=join(range(81,999),",")
-"highlight ColorColumn ctermbg=235 guibg=#402727
+
+"------ 100 Char line limit ------
+let &colorcolumn=join(range(100,999),",")
+highlight ColorColumn ctermbg=235 guibg=#402727
 
 " …but don't show it on files that don't make sense:
-"autocmd Filetype man setlocal colorcolumn&
-"autocmd Filetype netrw setlocal colorcolumn&
-"autocmd Filetype nerdtree setlocal colorcolumn&
-"autocmd Filetype conque_term setlocal colorcolumn&
+autocmd Filetype man setlocal colorcolumn&
+autocmd Filetype netrw setlocal colorcolumn&
+autocmd Filetype nerdtree setlocal colorcolumn&
+autocmd Filetype conque_term setlocal colorcolumn&
 set ruler
 
 
@@ -143,8 +153,9 @@ set directory=~/.vim/tmp
 set viewdir=~/.vim/tmp
 set viewoptions=cursor
 
-autocmd BufWinLeave * if expand("%") != "" | mkview   | endif
-autocmd BufWinEnter * if expand("%") != "" | loadview | endif
+" What do these do??
+"autocmd BufWinLeave * if expand("%") != "" | mkview   | endif
+"autocmd BufWinEnter * if expand("%") != "" | loadview | endif
 
 "------ Single Character Insert -
 function! RepeatChar(char, count)
@@ -152,17 +163,13 @@ function! RepeatChar(char, count)
 endfunction
 
 "------ Syntax and Spacing
+" Space makes spaces and tab makes tabs
 nnoremap <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 nnoremap <Tab>   :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 
 autocmd FileType html setlocal shiftwidth=2 tabstop=2
 autocmd FileType yml setlocal shiftwidth=2 tabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
-
-"------ Terraform Syntax and Spacing
-let g:rerraform_align=1
-let g:terraform_fold_sections=1
-let g:terraform_remap_spacebar=1
 
 "------ Trailing Whitespace -----
 function! TrimWhitespace()
@@ -177,16 +184,24 @@ endfunction
 autocmd BufWritePre * call TrimWhitespace()
 autocmd FileType cpp let b:noStripWhitespace=1 " this one's for the Prout :(
 
+" ------------------------------------
+"  -------- LANGUEAGE SPECIFIC  ---------
+" ------------------------------------
 
-"------- Undotree ----------------
-nnoremap <Leaders>u :UndotreeToggle<CR>
+"------ Go-ing Places -----------------
+let g:go_highlight_diagnostic_errors=0
+let g:go_highlight_diagnostic_warnings=0
 
-"------- Fuzzy Wuzzy was a Finder ----
-set rtp+=/usr/local/opt/fzf
-map <C-f> :FZF --height 40<CR>
 
-"------- gitgutter go fast ------
-set updatetime=250
+"------ Terraform Syntax and Spacing
+let g:terraform_align=1
+let g:terraform_fold_sections=1
+let g:terraform_remap_spacebar=1
+
+
+" ------------------------------------
+"  -------- PLUGIN CONFIGS ---------
+" ------------------------------------
 
 "------- Ctrl-p ------------------
 let g:ctrlp_cmd = 'CtrlPMixed'
@@ -205,27 +220,50 @@ if executable('ag')
  let g:ctrlp_use_caching = 0
 endif
 
-"------ Anything sublime can do, vim can do better (with help) ----
-"------ Multicursor, don't b0rk my bindings pls ------------------
-let g:multi_cursor_use_default_mapping=0
-let g:multi_cursor_next_key='<C-m>'
-let g:multi_cursor_prev_key='<C-b>'
-let g:multi_cursor_skip_key='<C-x>'
-let g:multi_cursor_quit_key='<Esc>'
-
-
 
 "------- Easymotion --------------
 let g:EasyMotion_leader_key = 'z'
 
 
-"------- Multiple-Cursors --------
-let g:multi_cursor_exit_from_visual_mode = 0
-let g:multi_cursor_exit_from_insert_mode = 0
+"------- Fuzzy Wuzzy was a Finder ----
+set rtp+=/usr/local/opt/fzf
+map <C-f> :FZF --height 40<CR>
 
-"------- NERDTREE THINGIES ------
+
+"------- gitgutter go fast ------
+set updatetime=250
+
+
+"------- NerdTree ------
+map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowHidden=1
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 
-noremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+
+"-------- Syntastic -------
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 1
+let g:syntastic_enable_highlighting = 1
+let g:syntastic_auto_jump = 3
+
+
+"-------- Tagbar  -------
+nmap <C-m> :TagbarToggle<CR>
+
+
+"------- Undotree ----------------
+nnoremap <Leaders>u :UndotreeToggle<CR>
+
+
+"------ Vim-Go -------
+Plugin 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+
+
+" -------- YouCompleteMe -------
+"  Needs a .ycm_custom_conf.py file in the root of a project to pick up
+"  docs and completions from source and imported packages
+let g:ycm_confirm_extra_conf = 0
+map <C-d> :YcmCompleter  GoToDeclaration<CR>

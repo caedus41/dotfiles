@@ -1,3 +1,13 @@
+## Testing
+#export BYOBU_PREFIX=/usr/local
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
+
+export FZF_COMPLETION_TRIGGER=''
+bindkey '^T' fzf-completion
+bindkey '^I' $fzf_default_completion
+
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -25,7 +35,7 @@ export TERM="xterm-256color"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
@@ -43,7 +53,7 @@ export TERM="xterm-256color"
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -64,6 +74,8 @@ export TERM="xterm-256color"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
+  forgit
+  zsh-autosuggestions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -126,6 +138,10 @@ bindkey \^Y kill-line
 autoload -U select-word-style
 select-word-style bash
 
+# iterm2 stuff
+
+source ~/.iterm2_shell_integration.zsh
+
 # Env Vars
 export HISTTIMEFORMAT="%d/%m/%y %T "
 export PATH="/usr/local/bin:$PATH"
@@ -133,11 +149,15 @@ export PATH="$HOME/bin:$PATH"
 export PATH="$PATH:/usr/local/bin/go"
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
+export PATH="$PATH:/Users/cthompson/workspace/istio-1.1.7/bin"
+export PATH="$PATH:/usr/local/opt/rabbitmq/sbin"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # Virtualenvs
 
 export WORKON_HOME=~/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
+
 
 # Fubectl
 
@@ -147,12 +167,13 @@ source /usr/local/bin/virtualenvwrapper.sh
 
 # Helm
 source <(helm completion zsh)
+source <(kubectl completion zsh)
 
 # Updates PATH for the Google Cloud SDK.
 if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin/google-cloud-sdk/path.zsh.inc'; fi
 
-# O'Reilly Init
-source /Users/cthompson/.oreilly_zsh.sh
+## Set up O'Reilly Specific Stuff
+source ~/.oreillyrc
 
 # ----------------------------------------
 # Aliases
@@ -181,12 +202,14 @@ alias Grep='grep'
 alias i='infractl'
 alias infra='cd /Users/cthompson/workspace/infractl/'
 alias k='kubectl'
+alias kseb='kubectl110 --context=dev-seb'
 alias ksfo='kubectl110 --context=prod-sfo'
 alias pretty='python -m json.tool'
 alias show='knife node show'
 alias tf='terraform'
 alias tfia='terraform init && terraform apply'
 alias tfds='cd ~/workspace/tf-ds'
+alias tfdocs='terraform-docs markdown table ./'
 alias trf='terraform'
 alias tns='tmux new -s'
 alias tls='tmux ls'
@@ -194,9 +217,9 @@ alias tas='tmux attach -t'
 alias tks='tmux kill-session -t'
 alias v='workon'
 alias vd='deactivate'
-alias vm='mkvirtualenv --python=/usr/local/bin/python3'
+alias vm='mkvirtualenv --python=/usr/local/bin/python3.8'
 alias vr='rmvirtualenv'
-alias ws='cd ~/workspace'
+#alias ws='cd ~/workspace'
 
 ff() {
     find ./ -name "*$1*"
@@ -250,3 +273,35 @@ rsed() {
 bd() {
     echo $1 | base64 -D
 }
+# ws() {
+    #if [[ -z $1 ]]; then
+        #cd ~/workspace
+    #else
+        #cd ~/workspace/$*
+    #fi
+#}
+
+ws() {
+    if [[ -z $1 ]]; then
+        dir=$(find ~/workspace -type d -maxdepth 5 | grep -v '\.git' | fzf --multi --ansi -i -1 --height=50% --header-lines=1 --inline-info --border | awk '{ print $1 }')
+        test -z $dir && cd ~/workspace || cd $dir
+    else
+        cd ~/workspace/$*
+    fi
+}
+__fzf_history__() (
+  local line
+  shopt -u nocaseglob nocasematch
+  line=$(
+    HISTTIMEFORMAT= builtin history |
+    FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac --sync -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
+    command grep '^ *[0-9]') &&
+    if [[ $- =~ H ]]; then
+      sed 's/^ *\([0-9]*\)\** .*/!\1/' <<< "$line"
+    else
+      sed 's/^ *\([0-9]*\)\** *//' <<< "$line"
+    fi
+)
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+eval "$(starship init zsh)"
