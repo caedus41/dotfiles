@@ -8,6 +8,7 @@ bindkey '^T' fzf-completion
 bindkey '^I' $fzf_default_completion
 
 
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -302,6 +303,9 @@ __fzf_history__() (
       sed 's/^ *\([0-9]*\)\** *//' <<< "$line"
     fi
 )
+
+source ~/.fzf.zsh
+
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 eval "$(starship init zsh)"

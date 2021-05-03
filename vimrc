@@ -11,23 +11,23 @@ call vundle#begin()
 
 " Go on, tell me that vim isn't an IDE. I dare ya. I triple dog dare ya!
 " Configs exist in this file for ctrl-p
+Plugin 'Konfekt/FastFold'
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'avakhov/vim-yaml'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'hashivim/vim-terraform'
 Plugin 'majutsushi/tagbar'
 Plugin 'mbbill/undotree'
+Plugin 'pedrohdz/vim-yaml-folds'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tmhedberg/SimpylFold'
-Plugin 'Konfekt/FastFold'
 Plugin 'tpope/vim-fugitive'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'wfxr/forgit'
 Plugin 'ycm-core/YouCompleteMe'
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 
 call vundle#end()            " required
@@ -92,6 +92,8 @@ nnoremap <C-H> <C-W><C-H>
 set splitbelow
 set splitright
 
+nnoremap <silent> <Leader>+ :exe "resize " . (winheight(0) * 3/2)<CR>
+nnoremap <silent> <Leader>- :exe "resize " . (winheight(0) * 2/3)<CR>
 
 "------ Tabs and Spaces ---------
 set expandtab
@@ -106,7 +108,7 @@ set cindent
 
 
 "------ 100 Char line limit ------
-let &colorcolumn=join(range(100,999),",")
+let &colorcolumn=join(range(100,101),",")
 highlight ColorColumn ctermbg=235 guibg=#402727
 
 " …but don't show it on files that don't make sense:
@@ -168,8 +170,8 @@ nnoremap <Space> :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1).
 nnoremap <Tab>   :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)."\e"<CR>
 
 autocmd FileType html setlocal shiftwidth=2 tabstop=2
-autocmd FileType yml setlocal shiftwidth=2 tabstop=2
-autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
+autocmd FileType yml setlocal shiftwidth=2 tabstop=2 expandtab
+autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 expandtab
 
 "------ Trailing Whitespace -----
 function! TrimWhitespace()
@@ -239,6 +241,18 @@ map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowHidden=1
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
+" Start NerdTree when vim starts
+autocmd VimEnter * NERDTree | wincmd p
+" Exit Vim if NERDTree is the only window left.
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() |
+    \ quit | endif
+" If another buffer tries to replace NERDTree, put in the other window, and bring back NERDTree.
+autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+    \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
+
+" Ignore build dirs
+let NERDTreeIgnore = [ '^build$[[dir]]', '^\.pytest_cache$[[dir]]', '^dist$[[dir]]', '.*egg-info$[[dir]]', '^\.git$[[dir]]']
+
 
 
 "-------- Syntastic -------
@@ -248,6 +262,8 @@ let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 1
 let g:syntastic_enable_highlighting = 1
 let g:syntastic_auto_jump = 3
+ let g:syntastic_python_python_exec = 'python3'
+ let g:syntastic_python_checkers = ['python']
 
 
 "-------- Tagbar  -------

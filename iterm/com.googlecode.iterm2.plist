@@ -107,12 +107,14 @@
 	</dict>
 	<key>NSWindow Frame NSFontPanel</key>
 	<string>711 153 573 103 0 0 1440 900 </string>
+	<key>NSWindow Frame ProfilesPanel</key>
+	<string>662 357 735 382 0 0 3008 1669 </string>
 	<key>NSWindow Frame SUAutomaticUpdateAlert</key>
 	<string>652 679 616 174 0 0 1920 1080 </string>
 	<key>NSWindow Frame SUStatusFrame</key>
 	<string>640 691 400 129 0 0 1680 1050 </string>
 	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>530 493 620 392 0 0 1680 1050 </string>
+	<string>1194 957 620 392 0 0 3008 1669 </string>
 	<key>NSWindow Frame SessionsPreferences</key>
 	<string>269 126 606 469 0 0 2560 1440 </string>
 	<key>NSWindow Frame SharedPreferences</key>
@@ -120,7 +122,7 @@
 	<key>NSWindow Frame UKCrashReporter</key>
 	<string>155 473 592 584 0 0 1920 1057 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 0 2560 1418 0 0 2560 1417 </string>
+	<string>0 0 3008 1670 0 0 3008 1669 </string>
 	<key>NSWindow Frame iTerm Window 1</key>
 	<string>273 83 570 467 0 0 1920 1080 </string>
 	<key>New Bookmarks</key>
@@ -3681,9 +3683,9 @@
 	<key>NoSyncFrame_SharedPreferences</key>
 	<dict>
 		<key>screenFrame</key>
-		<string>{{0, 0}, {2560, 1440}}</string>
+		<string>{{0, 0}, {1680, 1050}}</string>
 		<key>topLeft</key>
-		<string>{893, 978}</string>
+		<string>{269, 595}</string>
 	</dict>
 	<key>NoSyncHaveRequestedFullDiskAccess</key>
 	<true/>
@@ -3694,7 +3696,7 @@
 	<key>NoSyncInstallationId</key>
 	<string>455F36FB-A377-47B0-ACFB-B75D4553ABF6</string>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>21</integer>
+	<integer>33</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -4561,11 +4563,11 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-09-24T15:32:23Z</date>
+	<date>2021-01-22T14:48:39Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUSkippedVersion</key>
-	<string>3.3.12</string>
+	<string>3.4.3</string>
 	<key>SUUpdateGroupIdentifier</key>
 	<integer>1373811923</integer>
 	<key>SUUpdateRelaunchingMarker</key>
@@ -4575,7 +4577,7 @@
 	<key>SeparateWindowTitlePerTab</key>
 	<true/>
 	<key>ShowFullScreenTabBar</key>
-	<false/>
+	<true/>
 	<key>ShowPaneTitles</key>
 	<true/>
 	<key>SoundForEsc</key>
