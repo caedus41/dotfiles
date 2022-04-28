@@ -159,9 +159,15 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export WORKON_HOME=~/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
 
+# Docker
+export DOCKER_SCAN_SUGGEST=false
 
 # Fubectl
 
+export BUILD_PROJECT="common-build"
+export TEST_PROJECT="strong-keyword-184513"
+export PROD_PROJECT="platform-prod-399563"
+export DEV_PROJECT="platform-dev-788014"
 [ -f /usr/local/bin/fubectl.source ] && source /usr/local/bin/fubectl.source
 #source /path/to/kube-ps1.sh
 #PROMPT='$(kube_ps1)'$PROMPT
@@ -175,6 +181,10 @@ if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin
 
 ## Set up O'Reilly Specific Stuff
 source ~/.oreillyrc
+
+# NVM
+#export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # ----------------------------------------
 # Aliases
@@ -284,7 +294,7 @@ bd() {
 
 ws() {
     if [[ -z $1 ]]; then
-        dir=$(find ~/workspace -type d -maxdepth 5 | grep -v '\.git' | fzf --multi --ansi -i -1 --height=50% --header-lines=1 --inline-info --border | awk '{ print $1 }')
+        dir=$(find ~/workspace -type d -maxdepth 2 | grep -v '\.git' | fzf --multi --ansi -i -1 --height=50% --header-lines=1 --inline-info --border | awk '{ print $1 }')
         test -z $dir && cd ~/workspace || cd $dir
     else
         cd ~/workspace/$*

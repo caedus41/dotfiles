@@ -6,3 +6,4 @@ cp ~/.vimrc ./vimrc
 cp ~/.gitconfig ./gitconfig
 mkdir -p ./iterm
 cp ~/.iterm/* ./iterm/
+cp ~/.config/starship.toml ./starship.toml

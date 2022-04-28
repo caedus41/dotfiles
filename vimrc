@@ -173,6 +173,9 @@ autocmd FileType html setlocal shiftwidth=2 tabstop=2
 autocmd FileType yml setlocal shiftwidth=2 tabstop=2 expandtab
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 expandtab
 
+"------ Folding ------
+let g:fastfold_minlines = 0
+
 "------ Trailing Whitespace -----
 function! TrimWhitespace()
     if exists('b:noStripWhitespace')

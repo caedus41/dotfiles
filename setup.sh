@@ -5,11 +5,13 @@
 ### It doesn't work
 ### But, at least it's a list of what you want
 
+mkdir -p ~/.config
 cp ./zshrc ~/.zshrc
 cp ./tmux.conf ~/.tmux.conf
 cp ./vimrc ~/.vimrc
 cp ./gitconfig ~/.gitconfig
 cp ./iterm/* ~/.iterm/
+cp ./starship.toml ~/.config/starship.toml
 echo "Make sure to configure iterm to load configs from the ~/.iterm directory"
 
 #if [[ -z $(which brew) ]]; then

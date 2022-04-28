@@ -5,30 +5,83 @@ alias _inline_fzf_nh="fzf --multi --ansi -i -1 --height=50% --reverse -0 --inlin
 # [k] like g for git but 233% as effective!
 alias k="kubectl"
 
-# [kall] get all pods
-alias kall="kubectl get pods --all-namespaces"
+show_help() {
+    echo "This command will make it easier to use kubectl"
+    echo "Usage: kdes -n istio-system -c dev-gke deploy"
+    echo "Usage: kget -c playground namespace"
+}
 
-# [kwall] watch all pods
-alias kwall="watch kubectl get pods --all-namespaces"
+parse_args() {
+    PARAMS=""
+    unset CONTEXT
+    unset NAMESPACE
+    unset OBJECT
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|-/?|--help)
+                show_help
+                ;;
+            -c|--context|--cluster)
+                export CONTEXT=$2
+                test $FUBECTL_DEBUG && echo "CONTEXT IS $CONTEXT"
+                shift
+                ;;
+            -n|--namespace)
+                export NAMESPACE=$2
+                test $FUBECTL_DEBUG && echo "NAMESPACE IS $NAMESPACE"
+                shift
+                ;;
+            -?*)
+                test $FUBECTL_DEBUG && echo "End of args"
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                #TODO: Object can't be "all"
+                export OBJECT=$1
+                test $FUBECTL_DEBUG && echo "OBJECT IS $OBJECT"
+        esac
+        shift
+    done
+    test  "$CONTEXT" ||  { echo "No context was set. Set it with -c/--context" && return 1}
+    test  "$OBJECT" ||  { echo "No object was set. Pass it in at the end of the command" && return 1;}
+}
 
-# [kp] open kubernetes dashboard with proxy
-alias kp="open 'http://localhost:8001/ui' && kubectl proxy"
+run_kubectl_cmd() {
+    export COMMAND=$1
+    shift
+    test $FUBECTL_DEBUG && echo "COMMAND IS $COMMAND"
+    test $FUBECTL_DEBUG && echo $*
+    export FLAGS=$1
+    test $FUBECTL_DEBUG && echo "FLAGS IS $FLAGS"
+    test $FUBECTL_DEBUG && echo $*
+    shift
+    parse_args $* || return 1
 
-# [kwatch] watch resource
-kwatch() {
-    case "$1" in
-    # TODO Add more
+    if [[ $FLAGS == " " ]]; then
+        KUBECTL_INPUT=("--context" "$CONTEXT" "--namespace" "$NAMESPACE" "$COMMAND" "$OBJECT")
+    else
+        KUBECTL_INPUT=("--context" "$CONTEXT" "--namespace" "$NAMESPACE" "$COMMAND" "$FLAGS" "$OBJECT")
+    fi
+
+    case "$OBJECT" in
     nodes|no|node|ns|namespace|namespaces)
-        kubectl get "${1}" | _inline_fzf | awk '{print $1}' | xargs watch kubectl get "${1}"
+        kubectl get --context "$CONTEXT" "$OBJECT" | _inline_fzf | awk '{print $1}' | xargs kubectl "${KUBECTL_INPUT[@]}"
     ;;
     *)
-        kubectl get "${1}" --all-namespaces | _inline_fzf | awk '{print $1, $2}' | xargs watch kubectl get "${1}" -n
+        kubectl get --namespace "$NAMESPACE" --context "$CONTEXT" "$OBJECT" | _inline_fzf | awk '{print $1}' | xargs kubectl "${KUBECTL_INPUT[@]}"
     ;;
     esac
 }
-
+#
 # [kdebug] start debugging in cluster
-alias kdebug='kubectl run test --rm --restart=Never -it --image=ubuntu -- bash'
+kdebug() {
+    args=($* " ")
+    parse_args ${args}
+    kubectl run --context $CONTEXT -n $NAMESPACE test --rm --restart=Never -it --image=ubuntu -- bash
+}
 
 # [kube_ctx_name] get the current context
 kube_ctx_name() {
@@ -42,91 +95,96 @@ kube_ctx_namespace() {
     echo "$default_ns"
 }
 
-# [kget] get a resource by its YAML
-kget() {
-    case "$1" in
-    # TODO Add more
+
+# [kwatch] watch resource
+# Note this doesn't use run_kubectl_command b/c of the watch wrapping xargs
+kwatch() {
+    parse_args $*
+    case "$OBJECT" in
     nodes|no|node|ns|namespace|namespaces)
-        kubectl get "${1}" | _inline_fzf | awk '{print $1}' | xargs kubectl get -o yaml "${1}"
+        kubectl get --context "$CONTEXT" "$OBJECT" | _inline_fzf | awk '{print $1}' | xargs watch kubectl --context "$CONTEXT" get "$OBJECT"
     ;;
     *)
-        kubectl get "${1}" --all-namespaces | _inline_fzf | awk '{print $1, $2}' | xargs kubectl get -o yaml "${1}" -n
+        kubectl get --context "$CONTEXT" -n "$NAMESPACE" "$OBJECT" | _inline_fzf | awk '{print $1}' | xargs watch kubectl get --context "$CONTEXT" -n "$NAMESPACE" "$OBJECT"
     ;;
     esac
+}
+
+# [kget] get a resource by its YAML
+# kget deploy groot
+# kget pods
+kget() {
+    args=("get" "-oyaml" $*)
+    run_kubectl_cmd ${args}
 }
 
 # [kdes] describe resource
 kdes() {
-
-    case "$1" in
-    # TODO Add more
-    nodes|no|node|ns|namespace|namespaces)
-        kubectl get "${1}" | _inline_fzf | awk '{print $1}' | xargs kubectl describe "${1}"
-    ;;
-    *)
-        kubectl get "${1}" --all-namespaces | _inline_fzf | awk '{print $1, $2}' | xargs kubectl describe "${1}" -n
-    ;;
-    esac
+    args=("describe" " " $*)
+    run_kubectl_cmd ${args}
 }
 
+# TODO: This seems like it's asking for trouble
+# Why are you deleting so often that you need a fuzzy finder for it?
+# Before you use this, stop, rethink your life. How did you get here in the first place?
 # [kdel] delete resource
 kdel() {
-    case "$1" in
-    # TODO Add more
-    nodes|no|node|ns|namespace|namespaces)
-        kubectl get "${1}" | _inline_fzf | awk '{print $1}' | xargs kubectl delete "${1}"
-    ;;
-    *)
-        kubectl get "${1}" --all-namespaces | _inline_fzf | awk '{print $1, $2}' | xargs kubectl delete "${1}" -n
-    ;;
-    esac
+    args=("delete" " " $*)
+    run_kubectl_cmd ${args}
 }
 
 # [klog] fetch log from container
 klog() {
-    local line_count=10
-    if [[ $1 =~ ^[-]{0,1}[0-9]+$ ]]; then
-        line_count="$1"
-        shift
-    fi
+    args=($* "na")
+    parse_args ${args} || return 1
 
-    arg_pair=$(kubectl get po --all-namespaces | _inline_fzf | awk '{print $1, $2}')
-    pods_out=$(echo "$arg_pair" | xargs kubectl get po -o=jsonpath='{.spec.containers[*].name}' -n)
-    pod_choosen=$(echo "$pods_out" |  tr ' ' "\n" | _inline_fzf_nh)
-    eval kubectl logs -n "${arg_pair} -c ${pod_choosen}" --tail="${line_count}" "$@"
+    pod_name=$(kubectl get --namespace "$NAMESPACE" --context "$CONTEXT" pods | _inline_fzf | awk '{print $1}')
+    containers=$(echo "$pod_name" | xargs kubectl get po --context "$CONTEXT" -n "$NAMESPACE" -o=jsonpath='{.spec.containers[*].name}' )
+    container_choice=$(echo "$containers" |  tr ' ' "\n" | _inline_fzf_nh)
+    kubectl --context "$CONTEXT" -n "$NAMESPACE" logs "$pod_name" -c "$container_choice"
 }
 
 # [kex] execute command in container
 kex() {
-    arg_pair=$(kubectl get po --all-namespaces | _inline_fzf | awk '{print $1, $2}')
-    pods_out=$(echo "$arg_pair" | xargs kubectl get po -o=jsonpath='{.spec.containers[*].name}' -n)
-    pod_choosen=$(echo "$pods_out" |  tr ' ' "\n" | _inline_fzf_nh)
-    eval kubectl exec -it -n "${arg_pair}" -c "${pod_choosen}" -- "$1"
+    args=($* "na")
+    parse_args ${args} || return 1
+    #TODO: this breaks proper argument parsing by making it so the command has to be at the end.
+    to_run=$5
+
+    pod_name=$(kubectl get --namespace "$NAMESPACE" --context "$CONTEXT" pods | _inline_fzf | awk '{print $1}')
+    echo $pod_name
+    containers=$(echo "$pod_name" | xargs kubectl get po --context "$CONTEXT" -n "$NAMESPACE" -o=jsonpath='{.spec.containers[*].name}' )
+    container_choice=$(echo "$containers" |  tr ' ' "\n" | _inline_fzf_nh)
+    kubectl --context "$CONTEXT" -n "$NAMESPACE" exec "$pod_name" -c "$container_choice" -- "$to_run"
 }
 
 # [kfor] port-forward a container port to your local machine
 kfor() {
-    if [ ! -n "$1" ]; then
-        echo "Provide a port you want to forward"
-        return 255
-    fi
+    args=($* "na")
+    parse_args ${args} || return 1
+    #TODO: this breaks proper argument parsing by making it so the command has to be at the end.
+    port=$5
 
-    arg_pair="$(kubectl get po --all-namespaces | _inline_fzf | awk '{print $1, $2}')"
-    echo "kubectl port-forward -n ${arg_pair} $1"
-    eval kubectl port-forward -n "${arg_pair}" "$1"
+    pod_name=$(kubectl get --namespace "$NAMESPACE" --context "$CONTEXT" pods | _inline_fzf | awk '{print $1}')
+    kubectl port-forward --context "$CONTEXT" --namespace "$NAMESPACE" "$pod_name" "$port"
 }
 
-# [ksearch] search for string in resources
-ksearch() {
-    search_query="$1"
-    for ns in $(kubectl get --export -o=json ns | jq -r '.items[] | .metadata.name'); do
-        kubectl --namespace="${ns}" get --export -o=json \
-            deployment,ingress,daemonset,secrets,configmap,service,serviceaccount,statefulsets,pod,endpoints,customresourcedefinition,events,networkpolicies,persistentvolumeclaims,persistentvolumes,replicasets,replicationcontrollers,statefulsets,storageclasses | \
-        jq '.items[]' -c | \
-        grep "$search_query" | \
-        jq -r  '. | [.kind, .metadata.name] | @tsv' | \
-        awk -v prefix="$ns" '{print "kubectl get -n " prefix " " $0}'
-    done
+
+# [ksec] base64 decrypt secrets
+ksec() {
+    args=($* "na")
+    parse_args ${args} || return 1
+    secret=$(kubectl --context "$CONTEXT" --namespace "$NAMESPACE" get secret | _inline_fzf | awk '{print $1}')
+    kubectl get secret --context "$CONTEXT" -n "$NAMESPACE" "$secret" -o json | jq -r '.data | to_entries[] | "\n----\n\(.key): \(.value | @base64d)"'
+}
+
+
+# [kcm] Show config maps
+kcm() {
+    args=($* "na")
+    parse_args ${args} || return 1
+    cm=$(kubectl get cm --context "$CONTEXT" --namespace "$NAMESPACE" | _inline_fzf | awk '{print $1}')
+    kubectl get cm --context "$CONTEXT" -n "$NAMESPACE" "$cm" -o json | jq -r '.data | to_entries[] | "\n----\n\(.key): \(.value)"'
 }
 
 # [kcl] context list
@@ -175,18 +233,33 @@ khelp() {
     fi
 }
 
-# [ksec] base64 decrypt secrets
-alias _inline_fzf="fzf --multi --ansi -i -1 --height=50% --reverse -0 --header-lines=1 --inline-info --border"
-ksec () {
-    if [[ "$1" ]]; then ns="$1" else ns=$(kubectl get ns | _inline_fzf | awk '{print $1}') fi
-    secret=$(kubectl get secret -n "$ns" | _inline_fzf | awk '{print $1}')
-    kubectl get secret -n "$ns" "$secret" -o json | jq -r '.data | to_entries[] | "\n----\n\(.key): \(.value | @base64d)"'
-}
-
-
-# [kcm] Show config maps
-kcm () {
-    if [[ "$1" ]]; then ns="$1" else ns=$(kubectl get ns | _inline_fzf | awk '{print $1}') fi
-    secret=$(kubectl get cm -n "$ns" | _inline_fzf | awk '{print $1}')
-    kubectl get cm -n "$ns" "$secret" -o json | jq -r '.data | to_entries[] | "\n----\n\(.key): \(.value)"'
+# ----gcloud-----
+# [gssh] allows you to ssh into a GCS instance
+gssh() {
+    if [[ ! -z "$1" ]]; then
+        case "$1" in
+         cb|build|common-build)
+             PROJECT="common-build"
+             ;;
+         pg|play|playground)
+             PROJECT="strong-keyword-184513"
+             ;;
+         prod|platform-prod|production)
+             PROJECT="platform-prod-399563"
+             ;;
+         dev|platform-dev|develop)
+             PROJECT="platform-dev-788014"
+             ;;
+         bh-dev|binderhub-dev)
+             PROJECT="binderhub-dev"
+             ;;
+         bh-prod|binderhub-prod)
+             PROJECT="binderhub-prod"
+             ;;
+        esac
+    else
+        PROJECT=$(gcloud projects  list --format=json | jq -r '.[].projectId' | _inline_fzf)
+    fi
+    echo "PROJECT IS:  $PROJECT"
+    ssh $(gcloud compute instances  list --project $PROJECT | _inline_fzf | awk '{print $4}')
 }
