@@ -12,7 +12,7 @@ cp ./vimrc ~/.vimrc
 cp ./gitconfig ~/.gitconfig
 cp ./iterm/* ~/.iterm/
 cp ./starship.toml ~/.config/starship.toml
-cp ./fzf.bash ~/.fzf.bash
+cp ./fzf.zsh ~/.fzf.zsh
 echo "Make sure to configure iterm to load configs from the ~/.iterm directory"
 
 #if [[ -z $(which brew) ]]; then
