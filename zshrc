@@ -147,7 +147,7 @@ source ~/.iterm2_shell_integration.zsh
 export HISTTIMEFORMAT="%d/%m/%y %T "
 export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
-export PATH="$PATH:/usr/local/bin/go"
+export PATH="$PATH:/usr/local/go/bin"
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 export PATH="$PATH:/Users/cthompson/workspace/istio-1.1.7/bin"
@@ -217,6 +217,7 @@ alias kseb='kubectl110 --context=dev-seb'
 alias ksfo='kubectl110 --context=prod-sfo'
 alias pretty='python -m json.tool'
 alias show='knife node show'
+alias t='task'
 alias tf='terraform'
 alias tfia='terraform init && terraform apply'
 alias tfds='cd ~/workspace/tf-ds'

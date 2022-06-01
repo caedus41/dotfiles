@@ -124,6 +124,32 @@ kdes() {
     run_kubectl_cmd ${args}
 }
 
+kvs() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -c|--context|--cluster)
+                export CONTEXT=$2
+                test $FUBECTL_DEBUG && echo "CONTEXT IS $CONTEXT"
+                shift
+                ;;
+            -?*)
+                test $FUBECTL_DEBUG && echo "End of args"
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                #TODO: Object can't be "all"
+                export OBJECT=$1
+        esac
+        shift
+    done
+
+
+    kubectl get vs -n istio-system --context $CONTEXT -o custom-columns='NAME:.metadata.name,MATCHES:.spec.http.*.match' | _inline_fzf | awk '{print $1}' | xargs kubectl get --context "$CONTEXT" -n istio-system -oyaml vs | yq r - spec
+}
+
 # TODO: This seems like it's asking for trouble
 # Why are you deleting so often that you need a fuzzy finder for it?
 # Before you use this, stop, rethink your life. How did you get here in the first place?
@@ -152,10 +178,9 @@ kex() {
     to_run=$5
 
     pod_name=$(kubectl get --namespace "$NAMESPACE" --context "$CONTEXT" pods | _inline_fzf | awk '{print $1}')
-    echo $pod_name
     containers=$(echo "$pod_name" | xargs kubectl get po --context "$CONTEXT" -n "$NAMESPACE" -o=jsonpath='{.spec.containers[*].name}' )
     container_choice=$(echo "$containers" |  tr ' ' "\n" | _inline_fzf_nh)
-    kubectl --context "$CONTEXT" -n "$NAMESPACE" exec "$pod_name" -c "$container_choice" -- "$to_run"
+    kubectl --context "$CONTEXT" -n "$NAMESPACE" exec -it "$pod_name" -c "$container_choice" -- "$to_run"
 }
 
 # [kfor] port-forward a container port to your local machine

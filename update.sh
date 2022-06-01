@@ -7,3 +7,4 @@ cp ~/.gitconfig ./gitconfig
 mkdir -p ./iterm
 cp ~/.iterm/* ./iterm/
 cp ~/.config/starship.toml ./starship.toml
+cp /usr/local/bin/fubectl.source ./fubectl.source
