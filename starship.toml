@@ -1,58 +1,27 @@
 add_newline = false
 
-prompt_order = [
-#   "username",
-#   "hostname",
-    "directory",
-    "git_branch",
-    "git_commit",
-    "git_state",
-    "git_status",
-#   "hg_branch",
-    "docker_context",
-    "package",
-#   "dotnet",
-#   "elixir",
-#   "elm",
-#   "erlang",
-    "golang",
-#    "java",
-#   "julia",
-#   "nim",
-    "nodejs",
-#   "ocaml",
-#   "php",
-#   "purescript",
-    "python",
-    "ruby",
-    "rust",
-#   "terraform",
-#   "zig",
-#   "nix_shell",
-#   "conda",
-#   "memory_usage",
-#   "aws",
-#   "env_var",
-#   "crystal",
-#   "cmd_duration",
-#   "custom",
-#   "jobs",
-#   "battery",
-#   "time",
-    "kubernetes",
-    "line_break",
-    "character",
-]
+format = """$character\
+    $directory\
+    $git_branch\
+    $git_commit\
+    $git_state\
+    $docker_context\
+    $package\
+    $golang\
+    $nodejs\
+    $python\
+    $ruby\
+    $rust\
+    $kubernetes\
+    $line_break\
+"""
 
 [aws]
 disabled = true
 
 [character]
-symbol = "➜"
-error_symbol = "✗"
-style_success = "green"
-style_failure = "red"
-use_symbol_for_status = true
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
 
 [directory]
 truncation_length = 3
@@ -80,15 +49,13 @@ deleted = "🗑"
 
 [kubernetes]
 disabled = false
-prefix = ""
 style = "blue"
+format = '[⛵ $context \($namespace\)](dimmed blue) '
+
+
 [kubernetes.context_aliases]
-gke_platform-dev-788014_us-west1_platform-dev-cluster = "dev-gke"
-gke_common-build_us-central1_common-build-cluster = "common-build"
-gke_platform-prod-399563_us-west1_platform-prod-cluster = "prod-gke"
-gke_strong-keyword-184513_us-central1_playground-cluster = "playground"
-gke_binderhub-dev_us-central1_binderhub-dev-cluster = "binderhub-dev"
-gke_binderhub-prod_us-central1_binderhub-prod-cluster = "binderhub-prod"
+"gke_.*_(?P<var_cluster>[\\w-]+)" = "gke-$var_cluster"
+
 
 [terraform]
 disabled = true

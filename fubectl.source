@@ -146,8 +146,7 @@ kvs() {
         shift
     done
 
-
-    kubectl get vs -n istio-system --context $CONTEXT -o custom-columns='NAME:.metadata.name,MATCHES:.spec.http.*.match' | _inline_fzf | awk '{print $1}' | xargs kubectl get --context "$CONTEXT" -n istio-system -oyaml vs | yq r - spec
+    kubectl get vs -n istio-system --context $CONTEXT -o custom-columns='NAME:.metadata.name,MATCHES:.spec.http.*.match' | _inline_fzf | awk '{print $1}' | xargs kubectl get --context "$CONTEXT" -n istio-system -oyaml vs | yq .spec
 }
 
 # TODO: This seems like it's asking for trouble
