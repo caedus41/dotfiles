@@ -5,10 +5,8 @@ export FZF_COMPLETION_TRIGGER=''
 bindkey '^T' fzf-completion
 bindkey '^I' $fzf_default_completion
 
-
-
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/cthompson/.oh-my-zsh
+export ZSH=/home/caedus/.oh-my-zsh
 
 ZSH_THEME="robbyrussell"
 export TERM="xterm-256color"
@@ -31,10 +29,8 @@ COMPLETION_WAITING_DOTS="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  zsh-autosuggestions
 )
-
-source $ZSH/oh-my-zsh.sh
+source /home/caedus/.oh-my-zsh/oh-my-zsh.sh
 
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
@@ -55,7 +51,7 @@ compinit
 # ----------------------------------------
 # Forgit setup
 # ----------------------------------------
-source ~/workspace/forgit
+#source ~/workspace/forgit
 
 # ----------------------------------------
 # Bash-like (Thanks Mitch)
@@ -82,21 +78,22 @@ export PATH="$PATH:/Users/cthompson/workspace/istio-1.1.7/bin"
 export PATH="$PATH:/usr/local/opt/rabbitmq/sbin"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="/opt/homebrew/bin/:$PATH"
+export PATH="/home/caedus/.local/bin/:$PATH"
 
 # Docker
 export DOCKER_SCAN_SUGGEST=false
 
 # Gcloud/Kubectl
 # https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
-export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+#export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 # Fubectl
 
 [ -f /usr/local/bin/fubectl.source ] && source /usr/local/bin/fubectl.source
 
 # Helm
-source <(helm completion zsh)
-source <(kubectl completion zsh)
+#source <(helm completion zsh)
+#source <(kubectl completion zsh)
 
 # Updates PATH for the Google Cloud SDK.
 if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin/google-cloud-sdk/path.zsh.inc'; fi
@@ -111,7 +108,7 @@ if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin
 
 alias awls='awless list instances'
 alias crontab='crontab -i'
-alias dc='docker-compose'
+alias dc='docker compose'
 alias didt='tail -n 10 ~/.did.txt'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'

@@ -19,6 +19,7 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'hashivim/vim-terraform'
+Plugin 'junegunn/fzf'
 Plugin 'majutsushi/tagbar'
 Plugin 'mbbill/undotree'
 Plugin 'pedrohdz/vim-yaml-folds'
@@ -231,7 +232,7 @@ let g:EasyMotion_leader_key = 'z'
 
 
 "------- Fuzzy Wuzzy was a Finder ----
-set rtp+=/usr/local/opt/fzf
+set rtp+=/usr/bin/fzf
 map <C-f> :FZF --height 40<CR>
 
 
@@ -254,7 +255,7 @@ autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_
     \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
 
 " Ignore build dirs
-let NERDTreeIgnore = [ '^build$[[dir]]', '^\.pytest_cache$[[dir]]', '^dist$[[dir]]', '.*egg-info$[[dir]]', '^\.git$[[dir]]']
+let NERDTreeIgnore = ['^__pycache__$[[dir]]', '^build$[[dir]]', '^\.pytest_cache$[[dir]]', '^dist$[[dir]]', '.*egg-info$[[dir]]', '^\.git$[[dir]]']
 
 
 
