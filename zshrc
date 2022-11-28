@@ -82,6 +82,7 @@ export PATH="$PATH:/Users/cthompson/workspace/istio-1.1.7/bin"
 export PATH="$PATH:/usr/local/opt/rabbitmq/sbin"
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="/opt/homebrew/bin/:$PATH"
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
 # Docker
 export DOCKER_SCAN_SUGGEST=false
@@ -102,8 +103,8 @@ source <(kubectl completion zsh)
 if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin/google-cloud-sdk/path.zsh.inc'; fi
 
 # NVM
-#export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # ----------------------------------------
 # Aliases
@@ -111,7 +112,7 @@ if [ -f '/usr/local/bin/google-cloud-sdk/path.zsh.inc' ]; then . '/usr/local/bin
 
 alias awls='awless list instances'
 alias crontab='crontab -i'
-alias dc='docker-compose'
+alias dc='docker compose'
 alias didt='tail -n 10 ~/.did.txt'
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
@@ -128,6 +129,7 @@ alias cl='clear'
 alias g='git'
 alias Grep='grep'
 #alias grin='grep -rIin'
+alias gg='git grep -rIin'
 alias i='infractl'
 alias infra='cd /Users/cthompson/workspace/infractl/'
 alias k='kubectl'
@@ -205,6 +207,9 @@ ws() {
     fi
 }
 
+# Thanks, Brad
+tim() { tmux split-window -h -c "$(pwd)" "vim $1"; }
+
 __fzf_history__() (
   local line
   shopt -u nocaseglob nocasematch
@@ -219,4 +224,15 @@ __fzf_history__() (
     fi
 )
 
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Grab env vars and aliases specific to O'Reilly
+source ~/.oreillyrc
+
+# Leave this at the bottom of the file
 eval "$(starship init zsh)"
+

@@ -15,10 +15,12 @@ Plugin 'Konfekt/FastFold'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
-Plugin 'christoomey/vim-tmux-navigator'
+"Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'hashivim/vim-terraform'
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'mbbill/undotree'
 Plugin 'pedrohdz/vim-yaml-folds'
@@ -27,7 +29,12 @@ Plugin 'tmhedberg/SimpylFold'
 Plugin 'tpope/vim-fugitive'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'wfxr/forgit'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
 Plugin 'ycm-core/YouCompleteMe'
+Plugin 'andrewstuart/vim-kubernetes'
+Plugin 'knubie/vim-kitty-navigator'
+
 
 
 call vundle#end()            " required
@@ -84,10 +91,10 @@ nnoremap <silent> K :Ggrep <cword><CR>
 
 
 "------ Splits -----------------
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+nnoremap <C-J> :KittyNavigateDown<cr>
+nnoremap <C-K> :KittyNavigateUp<cr>
+nnoremap <C-L> :KittyNavigateRight<cr>
+nnoremap <C-H> :KittyNavigateLeft<cr>
 
 set splitbelow
 set splitright
@@ -254,7 +261,7 @@ autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_
     \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
 
 " Ignore build dirs
-let NERDTreeIgnore = [ '^build$[[dir]]', '^\.pytest_cache$[[dir]]', '^dist$[[dir]]', '.*egg-info$[[dir]]', '^\.git$[[dir]]']
+let NERDTreeIgnore = [ '^build$[[dir]]', '^\.pytest_cache$[[dir]]', '^dist$[[dir]]', '.*egg-info$[[dir]]', '^\.git$[[dir]]', '^__pycache__$[[dir]]']
 
 
 
@@ -276,6 +283,13 @@ nmap <C-m> :TagbarToggle<CR>
 "------- Undotree ----------------
 nnoremap <Leaders>u :UndotreeToggle<CR>
 
+"------- Utilisnips ----------------
+"" Trigger configuration. You need to change this to something other than <tab> if you use one of the following:
+" - https://github.com/Valloric/YouCompleteMe
+" - https://github.com/nvim-lua/completion-nvim
+let g:UltiSnipsExpandTrigger="<c-e>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 "------ Vim-Go -------
 Plugin 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
