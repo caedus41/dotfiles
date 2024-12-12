@@ -15,7 +15,6 @@ Plugin 'Konfekt/FastFold'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
-"Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'godlygeek/tabular'
 Plugin 'hashivim/vim-terraform'
@@ -23,17 +22,18 @@ Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 Plugin 'majutsushi/tagbar'
 Plugin 'mbbill/undotree'
-Plugin 'pedrohdz/vim-yaml-folds'
 Plugin 'scrooloose/nerdtree'
-Plugin 'tmhedberg/SimpylFold'
 Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-dispatch'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'wfxr/forgit'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'ycm-core/YouCompleteMe'
 Plugin 'andrewstuart/vim-kubernetes'
-Plugin 'knubie/vim-kitty-navigator'
+Plugin 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
+Plugin 'joe-mcgovern/vim-argo'
+Plugin 'groovy.vim'
 
 
 
@@ -182,6 +182,8 @@ autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 expandtab
 
 "------ Folding ------
 let g:fastfold_minlines = 0
+let g:vim_markdown_foldeing_disabled = 1
+set foldmethod=indent
 
 "------ Trailing Whitespace -----
 function! TrimWhitespace()
@@ -210,17 +212,37 @@ let g:terraform_align=1
 let g:terraform_fold_sections=1
 let g:terraform_remap_spacebar=1
 
+"------ Groovy Syntax
+au BufNewFile,BufRead Jenkinsfile*  setf groovy
+au BufNewFile,BufRead Jenkinsfile* set expandtab
+au BufNewFile,BufRead Jenkinsfile* set shiftwidth=2
+au BufNewFile,BufRead Jenkinsfile* set softtabstop=2
+
+let g:tagbar_type_groovy = {
+    \ 'ctagstype' : 'groovy',
+    \ 'kinds'     : [
+        \ 'p:package:1',
+        \ 'c:classes',
+        \ 'i:interfaces',
+        \ 't:traits',
+        \ 'e:enums',
+        \ 'm:methods',
+        \ 'f:fields:1'
+    \ ]
+\ }
+
 
 " ------------------------------------
 "  -------- PLUGIN CONFIGS ---------
 " ------------------------------------
 
 "------- Ctrl-p ------------------
+"TODO: ctrl-p and fzf (bound to ctrl+f) do the same thing?
 let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_extensions = ['mixed']
 let g:ctrlp_mruf_relative = 1
-let g:ctrlp_mruf_case_sensitive = 0
+let g:ctrlp_mruf_case_sensitive =    0
 " Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
 if executable('ag')
  " Use Ag over Grep
@@ -279,6 +301,35 @@ let g:syntastic_auto_jump = 3
 "-------- Tagbar  -------
 nmap <C-m> :TagbarToggle<CR>
 
+" tagbar settings for golang
+let g:tagbar_type_go = {
+	\ 'ctagstype' : 'go',
+	\ 'kinds'     : [
+		\ 'p:package',
+		\ 'i:imports:1',
+		\ 'c:constants',
+		\ 'v:variables',
+		\ 't:types',
+		\ 'n:interfaces',
+		\ 'w:fields',
+		\ 'e:embedded',
+		\ 'm:methods',
+		\ 'r:constructor',
+		\ 'f:functions'
+	\ ],
+	\ 'sro' : '.',
+	\ 'kind2scope' : {
+		\ 't' : 'ctype',
+		\ 'n' : 'ntype'
+	\ },
+	\ 'scope2kind' : {
+		\ 'ctype' : 't',
+		\ 'ntype' : 'n'
+	\ },
+	\ 'ctagsbin'  : 'gotags',
+	\ 'ctagsargs' : '-sort -silent'
+\ }
+
 
 "------- Undotree ----------------
 nnoremap <Leaders>u :UndotreeToggle<CR>
@@ -298,5 +349,8 @@ Plugin 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 " -------- YouCompleteMe -------
 "  Needs a .ycm_custom_conf.py file in the root of a project to pick up
 "  docs and completions from source and imported packages
-let g:ycm_confirm_extra_conf = 0
+" let g:ycm_confirm_extra_conf = 0
 map <C-d> :YcmCompleter  GoToDeclaration<CR>
+
+au filetype go inoremap <buffer> . .<C-x><C-o>
+

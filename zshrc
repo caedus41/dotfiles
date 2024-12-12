@@ -25,13 +25,15 @@ HYPHEN_INSENSITIVE="true"
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
+export DISABLE_AUTO_UPDATE=true
+
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
-  zsh-autosuggestions
+  fzf-tab
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -84,6 +86,11 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export PATH="/opt/homebrew/bin/:$PATH"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_EMOJI=1
+export HOMEBREW_NO_ENV_HINTS=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
+export HOMEBREW_NO_INSTALL_UPGRADE=1
 # Docker
 export DOCKER_SCAN_SUGGEST=false
 
@@ -135,11 +142,12 @@ alias infra='cd /Users/cthompson/workspace/infractl/'
 alias k='kubectl'
 alias kseb='kubectl110 --context=dev-seb'
 alias ksfo='kubectl110 --context=prod-sfo'
+alias pip='pip3'
 alias pretty='python -m json.tool'
 alias show='knife node show'
 alias t='task'
 alias tf='terraform'
-alias tfdocs='terraform-docs markdown table ./'
+alias tfdocs='terraform-docs --output-file README.md markdown table ./'
 alias tns='tmux new -s'
 alias tls='tmux ls'
 alias tas='tmux attach -t'
@@ -202,8 +210,11 @@ ws() {
     if [[ -z $1 ]]; then
         dir=$(find ~/workspace -type d -maxdepth 2 | grep -v '\.git' | fzf --multi --ansi -i -1 --height=50% --header-lines=1 --inline-info --border | awk '{ print $1 }')
         test -z $dir && cd ~/workspace || cd $dir
+    elif [[ -d ~/workspace/$1 ]]; then
+        cd ~/workspace/$1
     else
-        cd ~/workspace/$*
+        dir=$(find ~/workspace -type d -maxdepth 2 | grep -v '\.git' | fzf -q "$1" --multi --ansi -i -1 --height=50% --header-lines=1 --inline-info --border | awk '{ print $1 }')
+        test -z $dir && cd ~/workspace || cd $dir
     fi
 }
 
@@ -224,15 +235,16 @@ __fzf_history__() (
     fi
 )
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc'; fi
-
 # Grab env vars and aliases specific to O'Reilly
 source ~/.oreillyrc
 
 # Leave this at the bottom of the file
 eval "$(starship init zsh)"
 
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/cthompson/workspace/google-cloud-sdk/completion.zsh.inc'; fi
