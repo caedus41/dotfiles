@@ -122,6 +122,8 @@ vim.cmd("autocmd FileType html setlocal shiftwidth=2 tabstop=2")
 vim.cmd("autocmd FileType yml setlocal shiftwidth=2 tabstop=2 expandtab")
 vim.cmd("autocmd FileType yaml setlocal shiftwidth=2 tabstop=2 expandtab")
 
+vim.g.python_host_prog = "/opt/local/bin/python3.12"
+vim.g.python3_host_prog = "/opt/local/bin/python3.12"
 
 -- Plugin' Away
 require("config.lazy")
