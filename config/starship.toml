@@ -1,0 +1,61 @@
+add_newline = false
+
+format = """$character\
+    $directory\
+    $git_branch\
+    $git_commit\
+    $git_state\
+    $docker_context\
+    $package\
+    $golang\
+    $nodejs\
+    $python\
+    $ruby\
+    $rust\
+    $kubernetes\
+    $line_break\
+"""
+
+[aws]
+disabled = true
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = "🌱 "
+truncation_symbol = ""
+
+[git_status]
+disabled = false
+conflicted = "🏳"
+ahead = "🏎💨"
+behind = "😰"
+diverged = "😵"
+untracked = "🤷‍"
+stashed = "📦"
+modified = "📝"
+staged.value = "++"
+staged.style = "green"
+staged_count.enabled = true
+staged_count.style = "green"
+renamed = "👅"
+deleted = "🗑"
+
+[kubernetes]
+disabled = false
+style = "blue"
+format = '[⛵ $context \($namespace\)](dimmed blue) '
+
+
+[kubernetes.context_aliases]
+"gke_.*_(?P<var_cluster>[\\w-]+)" = "gke-$var_cluster"
+
+
+[terraform]
+disabled = true
