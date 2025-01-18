@@ -1,10 +1,11 @@
-function bindNeoTree()
+local function bindNeoTree()
     local current_buf = vim.api.nvim_get_current_buf()
     local current_buf_name = vim.api.nvim_buf_get_name(current_buf)
 
     -- If we're in Neo-tree, go back to previous window
     if current_buf_name:match("neo%-tree filesystem") then
         vim.cmd("wincmd p")
+        vim.cmd("Neotree reveal_force_cwd toggle=true filesystem reveal=true position=left")
         return
     end
 

@@ -7,7 +7,6 @@ vim.cmd("filetype off")
 vim.cmd("set visualbell")
 vim.cmd("set noerrorbells")
 -- Make it look pretty
---vim.cmd("colorscheme desert")
 vim.cmd("syntax enable")
 vim.cmd("set nu")
 
